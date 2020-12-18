@@ -1,7 +1,8 @@
 //image variables for the characters
-var azocadoImg, bombchuImg, canopusImg, derpyImg, funkydunkyImg, gefImg, kingkuffImg, siriusImg, tojiImg, caveImg, groundImg, restartImg, canopusJailed, tojiJailed, siriusJailed;
+var azocadoImg, bombchuImg, canopusImg, derpyImg, funkydunkyImg, gefImg, kingkuffImg, siriusImg, tojiImg, caveImg, groundImg, restartImg, canopusJailed, tojiJailed, siriusJailed, thunderImg, fireImg;
 var gef, derpy, kingkuff, bombchu, funkydunky, azocado, canopus, sirius, toji;
 var ground, restart;
+var thunder, fire;
 var health = 3;
 var gameState = "PLAY";
 
@@ -22,6 +23,8 @@ function preload() {
   caveImg = loadImage("characters/cave.png");
   groundImg = loadImage("characters/ground.png");
   restartImg = loadImage("characters/restart.png");
+  thunderImg = loadImage("characters/thunder.png");
+  fireImg = loadImage("characters/fire.png");
 }
 
 function setup() {
@@ -38,10 +41,11 @@ function setup() {
   bombchu = createSprite(2000, 270, 50, 50);
   bombchu.addImage(bombchuImg);
   kingkuff = createSprite(3000, 280, 50, 50);
-  //kingkuff.addImage(kingkuffImg);
-  //kingkuff.scale = 0.2;
+  kingkuff.addImage(kingkuffImg);
+  kingkuff.scale = 0.38;
   azocado = createSprite(4000, 280, 50, 50);
   azocado.addImage(azocadoImg);
+  azocado.scale = 0.95;
   canopus = createSprite(2100, 70, 50, 50);
   canopus.addImage(canopusJailed);
   toji = createSprite(1100, 70, 50, 50);
@@ -79,6 +83,22 @@ function draw() {
       gef.velocityY = -10;
     }
 
+    if (keyDown(UP_ARROW)) {
+      thunder = createSprite(camera.position.x, 200, 30, 200);
+      thunder.addImage(thunderImg);
+      thunder.scale = 0.4;
+    }
+
+    if (keyDown(RIGHT_ARROW)) {
+      fire = createSprite(camera.position.x+150, 280, 200, 30);
+      fire.addImage(fireImg);
+      fire.scale = 0.25;
+    }
+
+    if (frameCount%12 === 0) {
+      //thunder.destroy();
+    }
+
     if (gef.isTouching(derpy) && gef.y <= 260) {
       toji.addImage(tojiImg);
       console.log(derpy.x);
@@ -104,6 +124,14 @@ function draw() {
     }
 
     else if (gef.isTouching(bombchu) && gef.y > 260){
+      health-=1;
+    }
+
+    if (gef.isTouching(azocado) && gef.y <= 260) {
+      azocado.destroy();
+    }
+
+    else if (gef.isTouching(azocado) && gef.y > 260){
       health-=1;
     }
 
