@@ -1,10 +1,11 @@
 //image variables for the characters
-var azocadoImg, bombchuImg, canopusImg, derpyImg, funkydunkyImg, gefImg, kingkuffImg, siriusImg, tojiImg, caveImg, groundImg, restartImg, canopusJailed, tojiJailed, siriusJailed, thunderImg, fireImg;
+var azocadoImg, bombchuImg, canopusImg, derpyImg, funkydunkyImg, gefImg, kingkuffImg, siriusImg, tojiImg, caveImg, groundImg, restartImg, canopusJailed, tojiJailed, siriusJailed, thunderImg, fireImg, waterImg;
 var gef, derpy, kingkuff, bombchu, funkydunky, azocado, canopus, sirius, toji;
 var ground, restart;
-var thunder, fire;
+var thunder, fire, water, fireGroup, thunderGroup, waterGroup;
 var health = 3;
 var gameState = "PLAY";
+var count = 0;
 
 //preloads images
 function preload() {
@@ -25,6 +26,7 @@ function preload() {
   restartImg = loadImage("characters/restart.png");
   thunderImg = loadImage("characters/thunder.png");
   fireImg = loadImage("characters/fire.png");
+  waterImg = loadImage("characters/water.png");
 }
 
 function setup() {
@@ -56,6 +58,9 @@ function setup() {
   restart.addImage(restartImg);
   restart.scale = 2;
   restart.visible = false;
+  fireGroup = new Group();
+  thunderGroup = new Group();
+  waterGroup = new Group();
 }
 
 function draw() {
@@ -78,31 +83,52 @@ function draw() {
 
     gef.velocityY +=1;
 
-
     if (keyDown("space") && gef.y > 250) {
       gef.velocityY = -10;
     }
 
-    if (keyDown(UP_ARROW)) {
-      thunder = createSprite(camera.position.x, 200, 30, 200);
-      thunder.addImage(thunderImg);
-      thunder.scale = 0.4;
+    if (keyDown(UP_ARROW) && count>2) {
+      if (frameCount%50 === 0) {
+        thunder = createSprite(camera.position.x+100, 200, 30, 200);
+        thunder.addImage(thunderImg);
+        thunder.scale = 0.4;
+        thunder.lifetime = 20;
+        thunderGroup.add(thunder);
+      }
     }
 
-    if (keyDown(RIGHT_ARROW)) {
-      fire = createSprite(camera.position.x+150, 280, 200, 30);
-      fire.addImage(fireImg);
-      fire.scale = 0.25;
+    if (keyDown(RIGHT_ARROW) && count>0) {
+      if (frameCount%40 === 0) {
+        fire = createSprite(camera.position.x+150, 280, 200, 30);
+        fire.addImage(fireImg);
+        fire.scale = 0.25;
+        fire.lifetime = 20;
+        fireGroup.add(fire);
+      }
     }
 
-    if (frameCount%12 === 0) {
-      //thunder.destroy();
+    if (keyDown(DOWN_ARROW) && count >1) {
+      if (frameCount%40 === 0) {
+        water = createSprite(camera.position.x+150, 270, 40, 200);
+        water.addImage(waterImg);
+        water.scale = 0.3;
+        water.lifetime = 20;
+        waterGroup.add(water);
+      }
     }
+
+    //console.log(count);
 
     if (gef.isTouching(derpy) && gef.y <= 260) {
       toji.addImage(tojiImg);
-      console.log(derpy.x);
-      //derpy.destroy();
+      //console.log(derpy.x);
+      derpy.destroy();
+      Swal.fire(
+        'Good job!',
+        'You freed Toji!',
+        'success'
+      )
+      count = 1;
     }
 
     else if (gef.isTouching(derpy) && gef.y > 260){
@@ -112,6 +138,12 @@ function draw() {
     if (gef.isTouching(kingkuff) && gef.y <= 260) {
       sirius.addImage(siriusImg);
       kingkuff.destroy();
+      Swal.fire(
+        'Good job!',
+        'You freed Sirius!',
+        'success'
+      )
+      count = 3;
     }
 
     else if (gef.isTouching(kingkuff) && gef.y > 260){
@@ -121,6 +153,12 @@ function draw() {
     if (gef.isTouching(bombchu) && gef.y <= 260) {
       canopus.addImage(canopusImg);
       bombchu.destroy();
+      Swal.fire(
+        'Good job!',
+        'You freed Canopus!',
+        'success'
+      )
+      count = 2;
     }
 
     else if (gef.isTouching(bombchu) && gef.y > 260){
@@ -129,10 +167,105 @@ function draw() {
 
     if (gef.isTouching(azocado) && gef.y <= 260) {
       azocado.destroy();
+      Swal.fire(
+        'Good job!',
+        'You saved the world!',
+        'success'
+      )
     }
 
     else if (gef.isTouching(azocado) && gef.y > 260){
       health-=1;
+    }
+
+    if (fireGroup.isTouching(derpy)) {
+      toji.addImage(tojiImg);
+      derpy.destroy();
+    }
+
+    if (thunderGroup.isTouching(derpy)) {
+      toji.addImage(tojiImg);
+      derpy.destroy();
+    }
+
+    if (waterGroup.isTouching(derpy)) {
+      toji.addImage(tojiImg);
+      derpy.destroy();
+    }
+
+    if (fireGroup.isTouching(kingkuff)) {
+      sirius.addImage(siriusImg);
+      kingkuff.destroy();
+      Swal.fire(
+        'Good job!',
+        'You freed Sirius!',
+        'success'
+      )
+      count = 3;
+    }
+
+    if (thunderGroup.isTouching(kingkuff)) {
+      sirius.addImage(siriusImg);
+      kingkuff.destroy();
+    }
+
+    if (waterGroup.isTouching(kingkuff)) {
+      sirius.addImage(siriusImg);
+      kingkuff.destroy();
+      Swal.fire(
+        'Good job!',
+        'You freed Sirius!',
+        'success'
+      )
+      count = 3;
+    }
+
+    if (fireGroup.isTouching(bombchu)) {
+      canopus.addImage(canopusImg);
+      bombchu.destroy();
+      Swal.fire(
+        'Good job!',
+        'You freed Canopus!',
+        'success'
+      )
+      count = 2;
+    }
+
+    if (thunderGroup.isTouching(bombchu)) {
+      canopus.addImage(canopusImg);
+      bombchu.destroy();
+    }
+
+    if (waterGroup.isTouching(bombchu)) {
+      canopus.addImage(canopusImg);
+      bombchu.destroy();
+    }
+
+    if (thunderGroup.isTouching(azocado)) {
+      azocado.destroy();
+      Swal.fire(
+        'Good job!',
+        'You saved the world!',
+        'success'
+      )
+    }
+
+    if (fireGroup.isTouching(azocado)) {
+      azocado.destroy();
+      Swal.fire(
+        'Good job!',
+        'You saved the world!',
+        'success'
+      )
+    }
+
+    if (waterGroup.isTouching(azocado)) {
+      azocado.destroy();
+      Swal.fire(
+        'Good job!',
+        'You saved the world!',
+        'success'
+      )
     }
 
     if (health === 0) {
@@ -148,6 +281,7 @@ function draw() {
   if (mousePressedOver(restart) && gameState === "END") {
     
     health = 3;
+    count = 0;
     toji.addImage(tojiJailed);
     canopus.addImage(canopusJailed);
     sirius.addImage(siriusJailed);
