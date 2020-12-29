@@ -1,11 +1,16 @@
 //image variables for the characters
 var azocadoImg, bombchuImg, canopusImg, derpyImg, funkydunkyImg, gefImg, kingkuffImg, siriusImg, tojiImg, caveImg, groundImg, restartImg, canopusJailed, tojiJailed, siriusJailed, thunderImg, fireImg, waterImg;
+var hitSound, gameMusic, deathSound;
 var gef, derpy, kingkuff, bombchu, funkydunky, azocado, canopus, sirius, toji;
 var ground, restart;
 var thunder, fire, water, fireGroup, thunderGroup, waterGroup;
 var health = 3;
 var gameState = "PLAY";
 var count = 0;
+var spaceNum = 0;
+var downNum = 0;
+var rightNum = 0;
+var upNum = 0;
 
 //preloads images
 function preload() {
@@ -27,6 +32,9 @@ function preload() {
   thunderImg = loadImage("characters/thunder.png");
   fireImg = loadImage("characters/fire.png");
   waterImg = loadImage("characters/water.png");
+  gameMusic = loadSound("characters/OST.mp3");
+  hitSound = loadSound("characters/HIT.mp3");
+  deathSound = loadSound("characters/GAMEOVER.mp3");
 }
 
 function setup() {
@@ -61,6 +69,7 @@ function setup() {
   fireGroup = new Group();
   thunderGroup = new Group();
   waterGroup = new Group();
+  gameMusic.play();
 }
 
 function draw() {
@@ -82,6 +91,8 @@ function draw() {
     }
 
     gef.velocityY +=1;
+
+    
 
     if (keyDown("space") && gef.y > 250) {
       gef.velocityY = -10;
@@ -129,6 +140,7 @@ function draw() {
         'success'
       )
       count = 1;
+      hitSound.play();
     }
 
     else if (gef.isTouching(derpy) && gef.y > 260){
@@ -144,6 +156,7 @@ function draw() {
         'success'
       )
       count = 3;
+      hitSound.play();
     }
 
     else if (gef.isTouching(kingkuff) && gef.y > 260){
@@ -159,22 +172,22 @@ function draw() {
         'success'
       )
       count = 2;
+      hitSound.play();
     }
 
     else if (gef.isTouching(bombchu) && gef.y > 260){
       health-=1;
     }
 
-    if (gef.isTouching(azocado) && gef.y <= 260) {
-      azocado.destroy();
-      Swal.fire(
-        'Good job!',
-        'You saved the world!',
-        'success'
-      )
+    if (gef.isTouching(azocado) && gef.y <= 260 && spaceNum === 0) {
+      //azocado.destroy();
+      //console.log(spaceNum);
+      spaceNum=1;
+      
+      hitSound.play();
     }
 
-    else if (gef.isTouching(azocado) && gef.y > 260){
+    else if (gef.isTouching(azocado) && gef.y > 260 && spaceNum === 0 && downNum === 0 && rightNum === 0 && upNum === 0){
       health-=1;
     }
 
@@ -201,6 +214,7 @@ function draw() {
         'You freed Sirius!',
         'success'
       )
+      hitSound.play();
       count = 3;
     }
 
@@ -217,6 +231,7 @@ function draw() {
         'You freed Sirius!',
         'success'
       )
+      hitSound.play();
       count = 3;
     }
 
@@ -228,6 +243,7 @@ function draw() {
         'You freed Canopus!',
         'success'
       )
+      hitSound.play();
       count = 2;
     }
 
@@ -241,47 +257,69 @@ function draw() {
       bombchu.destroy();
     }
 
-    if (thunderGroup.isTouching(azocado)) {
-      azocado.destroy();
-      Swal.fire(
-        'Good job!',
-        'You saved the world!',
-        'success'
-      )
+    if (thunderGroup.isTouching(azocado) && upNum === 0) {
+      //azocado.destroy();
+      upNum=1;
+      
+      hitSound.play();
     }
 
-    if (fireGroup.isTouching(azocado)) {
-      azocado.destroy();
-      Swal.fire(
-        'Good job!',
-        'You saved the world!',
-        'success'
-      )
+    if (fireGroup.isTouching(azocado) && rightNum === 0) {
+      //azocado.destroy();
+      rightNum=1;
+      
+      hitSound.play();
     }
 
-    if (waterGroup.isTouching(azocado)) {
-      azocado.destroy();
+    if (waterGroup.isTouching(azocado) && downNum === 0) {
+      //azocado.destroy();
+      downNum=1;
+      
+      hitSound.play();
+    }
+
+    if (spaceNum+downNum+rightNum+upNum === 4 && gameState === "PLAY") {
       Swal.fire(
         'Good job!',
         'You saved the world!',
         'success'
       )
+      gameState = "END";
+      azocado.destroy();
     }
 
     if (health === 0) {
+      gameMusic.stop();
+      deathSound.play();
       gameState = "END";
     }
   }
 
   else if (gameState === "END") {
+    gameMusic.stop();
     gef.x = 400;
     restart.visible = true;
   }
 
   if (mousePressedOver(restart) && gameState === "END") {
-    
+    deathSound.stop();
+    gameMusic.play();
     health = 3;
     count = 0;
+    spaceNum = 0;
+    downNum = 0;
+    rightNum = 0;
+    upNum = 0;
+    derpy = createSprite(1000, 270, 50, 50);
+    derpy.addImage(derpyImg);
+    bombchu = createSprite(2000, 270, 50, 50);
+    bombchu.addImage(bombchuImg);
+    kingkuff = createSprite(3000, 280, 50, 50);
+    kingkuff.addImage(kingkuffImg);
+    kingkuff.scale = 0.38;
+    azocado = createSprite(4000, 280, 50, 50);
+    azocado.addImage(azocadoImg);
+    azocado.scale = 0.95;
     toji.addImage(tojiJailed);
     canopus.addImage(canopusJailed);
     sirius.addImage(siriusJailed);
@@ -296,4 +334,8 @@ function draw() {
   azocado.collide(ground);
   drawSprites();
   //console.log(health);
+}
+
+function keyPressed() {
+  
 }
